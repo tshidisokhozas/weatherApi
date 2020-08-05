@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head class="bg-1">
+    <title>Weather</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
+
+    <style>
+        .bg-background {
+            background-color:silver;
+        }
+
+        .bg-card-color {
+            background-color: #053B5D;
+        }
+
+    </style>
+</head>
+
+<body>
+
+
+<div class="container-fluid bg-background">
+
+    <div class="container h-100">
+        <div class="row h-100 justify-content-center align-content-center">
+            <h1 class="text-white" style="padding: 30px">Weather</h1>
+        </div>
+    </div>
+
+    <br><br>
+    <div class="container h-100">
+        <div class="row h-100 justify-content-center align-content-center ">
+            <form  method="post">
+                {% csrf_token %}
+                <div class="field">
+                    <div class="control">
+                        {{ form.city }}
+                    </div>
+                    {% for error in form.post.errors %}
+                        <p class="help is-danger">{{ error }} </p>
+                    {% endfor %}
+                </div>
+                {% csrf_token %}
+                <div class="field">
+                    <div class="control">
+                        {{  form.period}}
+                    </div>
+                    {% for error in form.post.errors %}
+                        <p class="help is-danger">{{ error }} </p>
+                    {% endfor %}
+                </div>
+                <br>
+                <button type="submit" class="btn  text-white  bg-card-color ">Get Weather</button>
+            </form>
+        </div>
+    </div>
+    <br><br>
+
+    <div class="container h-100">
+        <div class="row h-100 justify-content-center align-content-center">
+
+
+            {% if description %}
+                <div class="card text-white bg-card-color  border border-dark" style="width: 18rem">
+                    <div class="card-header mb-3 text-center">
+                        Current Weather
+                    </div>
+                    <div>
+                        <h5 class="mb-1 text-center">{{ name }}, {{ country }}
+                        </h5>
+                        <h6 class="mb-2 text-center">{{ date }}</h6>
+                        <h6 class="mb-2 text-center">{{ time }}</h6>
+                        <h1 class="mb-3 text-center">{{ temp }}<span> &#8451</span></h1>
+                        <p class="mb-2 text-center"> Description : {{ description }}<img
+                                src="https://openweathermap.org/img/w/{{ icon }}.png"></p>
+                    </div>
+                </div>
+            {% else %}
+                <h1 class="text-white"> Weather Data Not Found </h1>
+            {% endif %}
+
+
+        </div>
+    </div>
+        <div style="margin-top:30px;margin-bottom: 30px">
+            <div style="display: flex;justify-content: center;align-items: center;">
+                <canvas id="genderChart" width="1000"></canvas>
+            </div>
+        </div>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+        <script>
+            $.ajax({
+                method: 'GET',
+                url: '/data/',
+                success: function (daily_data) {
+                    console.log(daily_data);
+                    new Chart(document.getElementById("genderChart"), {
+                        type: 'bar',
+                        data: {
+                            labels: daily_data.Days,
+                            datasets: [
+                                {
+                                    label: "Day Low Temp",
+                                    backgroundColor: "rgba(62, 149, 205, 0.5)",
+                                    borderColor: "rgba(62, 149, 205, 1)",
+                                    pointBackgroundColor: "rgba(62, 149, 205, 1)",
+                                    data: daily_data.LowTemp,
+                                },
+                                {
+                                    label: "Day High Temp",
+                                    backgroundColor: "rgba(255, 10, 77, 0.5)",
+                                    borderColor: "rgba(255, 10, 77, 1)",
+                                    pointBackgroundColor: "rgba(255, 10, 77, 1)",
+                                    data: daily_data.HighTemp,
+                                },
+                            ]
+                        },
+                        options: {
+                            legend: {
+                                labels: {
+                                    fontSize: 20
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: "Daily Weather Focus Statistics",
+                                fontSize: 22.0
+                            },
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: true,
+                                        fontSize: 15.0,
+                                    },
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: 'Temparature',
+                                        fontSize: 20.0,
+                                    }
+                                }],
+                                xAxes: [{
+                                    ticks: {
+                                        fontSize: 15.0,
+                                    },
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: 'Days',
+                                        fontSize: 20.0,
+                                    }
+                                }]
+                            },
+                            responsive: false,
+                        }
+                    });
+                },
+                error: function (day_temp_min) {
+                    console.log('Error!');
+                }
+            });
+        </script>
+</body>
+</html>
